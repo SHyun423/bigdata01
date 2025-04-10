@@ -1,17 +1,13 @@
-rinks = ["아이스 아메리카노", "카페 라떼", "수박 주스"]
-prices = [1500, 2500, 4000]
-amounts = [0, 0, 0]
-drinks = ["아이스 아메리카노", "카페 라떼", "수박 주스", "딸기 주스"]
-prices = [1500, 2500, 4000, 4200]
+# drinks = ["아이스 아메리카노", "카페 라떼", "수박 주스", "딸기 주스"]
+# prices = [1500, 2500, 4000, 4200]
 
-# drinks = ["아이스 아메리카노"]
-# prices = [1500]
-# amounts = [0]
+drinks = ["아이스 아메리카노"]
+prices = [1500]
 total_price = 0
-amounts = list()
-for _ in range(len(drinks)):
-    amounts.append(0)
-
+# amounts = list()
+# for _ in range(len(drinks)):
+#     amounts.append(0)
+amounts = [0 for _ in range(len(drinks))]  # list comprehension (리스트 축약)
 
 def order_process(idx):
     """
@@ -26,13 +22,22 @@ def order_process(idx):
 
 menu_texts = ""
 for j in range(len(drinks)):
-    menu_texts = menu_texts + f"{j + 1}) {drinks[j]} {prices[j]}원  "
-menu_texts = menu_texts + f"{len(drinks) + 1}) 주문종료 : "
+    menu_texts = menu_texts + f"{j+1}) {drinks[j]} {prices[j]}원  "
+menu_texts = menu_texts + f"{len(drinks)+1}) 주문종료 : "
 
 while True:
     menu = int(input(menu_texts))
     if len(drinks) >= menu >= 1:
         order_process(menu - 1)
-    elif menu == len(drinks) + 1:
+    elif menu == len(drinks)+1:
         print("주문을 종료합니다")
         break
+    else:
+        print(f"{menu}번 메뉴는 존재하지 않습니다. 아래 메뉴에서 골라주세요")
+
+print("상품명 단가 수량 금액")
+for i in range(len(drinks)):
+    if amounts[i] > 0:
+        print(f"{drinks[i]} {prices[i]} {amounts[i]} {prices[i] * amounts[i]}")
+
+print(f"총 주문 금액 : {total_price}원")

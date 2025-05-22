@@ -1,3 +1,4 @@
+# ddl creat (created_at field)
 # dml insert -> update
 import kiosk as kk
 

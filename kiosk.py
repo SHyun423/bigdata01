@@ -1,4 +1,5 @@
-import datetime
+# import datetime
+from datetime import datetime
 import sqlite3
 
 drinks = ["아이스 아메리카노", "카페 라떼", "수박 주스", "딸기 주스"]
@@ -12,7 +13,7 @@ total_price = 0
 DISCOUNT_THRESHOLD = 10000  # 할인이 적용되는 임계값 (임계값 이상이면 할인 적용)
 DISCOUNT_RATE = 0.05  # 할인율
 
-def run():
+def run() -> None:
     """
     키오스크 실행(구동) 함수
     :return: None
@@ -30,6 +31,7 @@ def run():
         except ValueError:
             print(f"문자를 입력할 수 없습니다. 숫자를 입력해주세요")
 
+
 def apply_discount(price: int) -> float:
     """
     총 금액이 특정 금액(임계값)을 넘어서면 할인율을 적용하는 함수
@@ -44,28 +46,30 @@ def apply_discount(price: int) -> float:
 def print_ticket_number() -> None:
     """
     주문 번호표 출력 함수
-    :return: 번호
+    :return: None
     """
     conn = sqlite3.connect('cafe.db')  # db instance open
     cur = conn.cursor()
-
     cur.execute('''
         create table if not exists ticket (
         id integer primary key autoincrement,
-        number integer not null
+        number integer not null,
+        created_at text not null default (datetime('now', 'localtime'))
         )
     ''')
 
     cur.execute('select number from ticket order by number desc limit 1')
     result = cur.fetchone()
 
+    now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     if result is None:
         number = 1
-        cur.execute('insert into ticket (number) values (?)', (number,))
+        cur.execute('insert into ticket (number, created_at) values (?, ?)', (number, now))
     else:
         number = result[0] + 1
-       # cur.execute('update ticket set number = ?', (number,))
-        cur.execute('update ticket set number=? where id = (select id from ticket order by number desc limit 1)'), (number)
+        # cur.execute('update ticket set number=? where id = (select id from ticket order by number desc limit 1)', (number,))
+        cur.execute('insert into ticket (number, created_at) values (?, ?)', (number, now))
+
     conn.commit()
     print(f"번호표 : {number}")
 
@@ -106,13 +110,13 @@ def print_receipt() -> None:
     discounted_price = apply_discount(total_price)
     discount = total_price - discounted_price
 
-    print(f"할인 전 총 주문 금액 : {total_price}원 ({DISCOUNT_RATE*100}% 할인)")
+    print(f"할인 전 총 주문 금액 : {total_price}원")
     if discount > 0:
-        print(f"할인 금액 : {discount}원")
+        print(f"할인 금액 : {discount}원 ({DISCOUNT_RATE*100}% 할인)")
         print(f"할인 적용 후 지불하실 총 금액은 {discounted_price}원 입니다.")
     else:
         print(f"할인이 적용되지 않았습니다.\n지불하실 총 금액은 {total_price}원 입니다.")
-        print(f"{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
 
 def test() -> None:
@@ -120,4 +124,4 @@ def test() -> None:
     앞으로 추가될 키오스크 기능
     :return:
     """
-
+    pass
